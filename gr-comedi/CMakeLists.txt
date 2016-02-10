@@ -73,7 +73,7 @@ CPACK_COMPONENT("comedi_devel"
 CPACK_COMPONENT("comedi_python"
     GROUP        "Comedi"
     DISPLAY_NAME "Python"
-    DESCRIPTION  "Python modules for runtime"
+    DESCRIPTION  "Python modules for runtime; GRC xml files"
     DEPENDS      "runtime_python;comedi_runtime"
 )
 
@@ -92,6 +92,7 @@ add_subdirectory(lib)
 if(ENABLE_PYTHON)
     add_subdirectory(swig)
     add_subdirectory(python/comedi)
+    add_subdirectory(grc)
 endif(ENABLE_PYTHON)
 
 ########################################################################
