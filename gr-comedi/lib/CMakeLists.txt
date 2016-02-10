@@ -44,6 +44,8 @@ endif(ENABLE_GR_CTRLPORT)
 list(APPEND comedi_sources
     sink_s_impl.cc
     source_s_impl.cc
+    sink_f_impl.cc
+    source_f_impl.cc
 )
 
 list(APPEND comedi_libs

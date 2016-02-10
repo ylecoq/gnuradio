@@ -24,6 +24,8 @@ install(FILES
     api.h
     sink_s.h
     source_s.h
+    sink_f.h
+    source_f.h
     DESTINATION ${GR_INCLUDE_DIR}/gnuradio/comedi
     COMPONENT "comedi_devel"
 )

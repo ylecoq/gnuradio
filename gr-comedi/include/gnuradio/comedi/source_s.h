@@ -30,11 +30,11 @@ namespace gr {
   namespace comedi {
 
     /*!
-     * \brief source using COMEDI
+     * \brief source using COMEDI, short output (16 bits max raw data)
      *
      * The source has one to many input stream of signed short integers.
      *
-     * Output samples will be in the range [-32768,32767].
+     * Output samples will be in the range [-32768,32767]. 16 bits ADC devices only !
      */
     class COMEDI_API source_s : virtual public sync_block
     {
@@ -43,7 +43,7 @@ namespace gr {
       typedef boost::shared_ptr<source_s> sptr;
 
       /*!
-       * \brief make a COMEDI source.
+       * \brief make a COMEDI source, short output (16 bits max raw data).
        *
        * \param sampling_freq sampling rate in Hz
        * \param dev COMEDI device name, e.g., "/dev/comedi0"

@@ -5,12 +5,12 @@
 ###################################################
  -->
 <block>
-	<name>Comedi Sink</name>
-	<key>comedi_sink</key>
+	<name>Comedi Sink F</name>
+	<key>comedi_sink_f</key>
 	<category>Comedi</category>
 	<flags>throttle</flags>
 	<import>from gnuradio import comedi</import>
-	<make>comedi.sink_s($samp_rate, $device_name)</make>
+	<make>comedi.sink_f($samp_rate, $device_name)</make>
 	<param>
 		<name>Sample Rate</name>
 		<key>samp_rate</key>
@@ -33,7 +33,7 @@
 	<check>0 &lt; $num_inputs</check>
 	<sink>
 		<name>in</name>
-		<type>short</type>
+		<type>float</type>
 		<nports>$num_inputs</nports>
 	</sink>
 	<doc>

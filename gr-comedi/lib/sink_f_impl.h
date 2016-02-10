@@ -20,10 +20,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_COMEDI_SINK_S_IMPL_H
-#define INCLUDED_COMEDI_SINK_S_IMPL_H
+#ifndef INCLUDED_COMEDI_SINK_F_IMPL_H
+#define INCLUDED_COMEDI_SINK_F_IMPL_H
 
-#include <gnuradio/comedi/sink_s.h>
+#include <gnuradio/comedi/sink_f.h>
 #include <string>
 #include <comedilib.h>
 #include <stdexcept>
@@ -31,11 +31,11 @@
 namespace gr {
   namespace comedi {
 
-    class sink_s_impl : public sink_s
+    class sink_f_impl : public sink_f
     {
     private:
       // typedef for pointer to class work method
-      typedef int (sink_s::*work_t)(int noutput_items,
+      typedef int (sink_f::*work_t)(int noutput_items,
 				    gr_vector_const_void_star &input_items,
 				    gr_vector_void_star &output_items);
 
@@ -57,8 +57,8 @@ namespace gr {
       void bail(const char *msg, int err) throw (std::runtime_error);
 
     public:
-      sink_s_impl(int sampling_freq, const std::string device_name);
-      ~sink_s_impl();
+      sink_f_impl(int sampling_freq, const std::string device_name);
+      ~sink_f_impl();
 
       bool check_topology(int ninputs, int noutputs);
 
@@ -70,4 +70,4 @@ namespace gr {
   } /* namespace comedi */
 } /* namespace gr */
 
-#endif /* INCLUDED_COMEDI_SINK_S_IMPL_H */
+#endif /* INCLUDED_COMEDI_SINK_F_IMPL_H */

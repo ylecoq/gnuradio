@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+##Audio Sink
+###################################################
+ -->
+<block>
+	<name>Comedi Sink S</name>
+	<key>comedi_sink_s</key>
+	<category>Comedi</category>
+	<flags>throttle</flags>
+	<import>from gnuradio import comedi</import>
+	<make>comedi.sink_s($samp_rate, $device_name)</make>
+	<param>
+		<name>Sample Rate</name>
+		<key>samp_rate</key>
+		<value>samp_rate</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Device Name</name>
+		<key>device_name</key>
+		<value>/dev/comedi0</value>
+		<type>string</type>
+		<hide>#if $device_name() then 'none' else 'part'#</hide>
+	</param>
+	<param>
+		<name>Num Inputs</name>
+		<key>num_inputs</key>
+		<value>1</value>
+		<type>int</type>
+	</param>
+	<check>0 &lt; $num_inputs</check>
+	<sink>
+		<name>in</name>
+		<type>short</type>
+		<nports>$num_inputs</nports>
+	</sink>
+	<doc>
+Not all sampling rates will be supported by your hardware.
+
+this sink will output 1 stream of signed short integers to the DA0 of a comedi device.
+
+Input samples must be in the range [-32768,32767]
+	</doc>
+</block>

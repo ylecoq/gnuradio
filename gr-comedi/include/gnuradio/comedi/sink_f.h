@@ -20,8 +20,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_COMEDI_SINK_S_H
-#define INCLUDED_COMEDI_SINK_S_H
+#ifndef INCLUDED_COMEDI_SINK_F_H
+#define INCLUDED_COMEDI_SINK_F_H
 
 #include <gnuradio/comedi/api.h>
 #include <gnuradio/sync_block.h>
@@ -30,20 +30,20 @@ namespace gr {
   namespace comedi {
 
     /*!
-     * \brief sink using COMEDI, input as short (16 bits max raw data).
+     * \brief sink using COMEDI, float input
      *
-     * The sink has one input stream of signed short integers.
+     * The sink has one input stream of floats.
      *
-     * Input samples must be in the range [-32768,32767].
+     * Input float samples are processed by comedi_from_phys() before output to DAC0.
      */
-    class COMEDI_API sink_s : virtual public sync_block
+    class COMEDI_API sink_f : virtual public sync_block
     {
     public:
-      // gr::comedi::sink_s::sptr
-      typedef boost::shared_ptr<sink_s> sptr;
+      // gr::comedi::sink_f::sptr
+      typedef boost::shared_ptr<sink_f> sptr;
 
       /*!
-       * \brief make a COMEDI sink, input as short (raw data).
+       * \brief make a COMEDI sink, float input.
        *
        * \param sampling_freq sampling rate in Hz
        * \param dev COMEDI device name, e.g., "/dev/comedi0"
@@ -55,4 +55,4 @@ namespace gr {
   } /* namespace comedi */
 } /* namespace gr */
 
-#endif /* INCLUDED_COMEDI_SINK_S_H */
+#endif /* INCLUDED_COMEDI_SINK_F_H */

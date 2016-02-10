@@ -5,8 +5,8 @@
 ###################################################
  -->
 <block>
-	<name>Comedi Source</name>
-	<key>comedi_source</key>
+	<name>Comedi Source S</name>
+	<key>comedi_source_s</key>
 	<category>Comedi</category>
 	<flags>throttle</flags>
 	<import>from gnuradio import comedi</import>
@@ -40,5 +40,7 @@
 Not all sampling rates will be supported by your hardware.
 
 Output is 1 stream of signed short integers. Output samples will be in the range [-32768,32767]
+
+This is not tested, since I don't own a compatible hardware (YLC)
 	</doc>
 </block>

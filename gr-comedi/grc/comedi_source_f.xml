@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+###################################################
+##Comedi Source
+###################################################
+ -->
+<block>
+	<name>Comedi Source F</name>
+	<key>comedi_source_f</key>
+	<category>Comedi</category>
+	<flags>throttle</flags>
+	<import>from gnuradio import comedi</import>
+	<make>comedi.source_f($samp_rate, $device_name)</make>
+	<param>
+		<name>Sample Rate</name>
+		<key>samp_rate</key>
+		<value>samp_rate</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Device Name</name>
+		<key>device_name</key>
+		<value>/dev/comedi0</value>
+		<type>string</type>
+		<hide>#if $device_name() then 'none' else 'part'#</hide>
+	</param>
+	<param>
+		<name>Num Outputs</name>
+		<key>num_outputs</key>
+		<value>1</value>
+		<type>int</type>
+	</param>
+	<check>0 &lt; $num_outputs</check>
+	<source>
+		<name>out</name>
+		<type>float</type>
+		<nports>$num_outputs</nports>
+	</source>
+	<doc>
+Not all sampling rates will be supported by your hardware.
+
+Output is 1 stream of signed short integers. Output samples will be in the range [-32768,32767]
+	</doc>
+</block>

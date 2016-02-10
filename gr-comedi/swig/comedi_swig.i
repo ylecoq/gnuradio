@@ -30,10 +30,16 @@
 %{
 #include "gnuradio/comedi/sink_s.h"
 #include "gnuradio/comedi/source_s.h"
+#include "gnuradio/comedi/sink_f.h"
+#include "gnuradio/comedi/source_f.h"
 %}
 
 %include "gnuradio/comedi/sink_s.h"
 %include "gnuradio/comedi/source_s.h"
+%include "gnuradio/comedi/sink_f.h"
+%include "gnuradio/comedi/source_f.h"
 
 GR_SWIG_BLOCK_MAGIC2(comedi, sink_s);
 GR_SWIG_BLOCK_MAGIC2(comedi, source_s);
+GR_SWIG_BLOCK_MAGIC2(comedi, sink_f);
+GR_SWIG_BLOCK_MAGIC2(comedi, source_f);
