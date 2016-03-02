@@ -38,6 +38,9 @@
 namespace gr {
   namespace comedi {
 
+    static comedi_range * range_info[256];
+    static lsampl_t maxdata[256];
+
     static std::string
     default_device_name()
     {
@@ -62,11 +65,12 @@ namespace gr {
 	d_device_name(device_name.empty() ? default_device_name() : device_name),
 	d_dev(0),
 	d_subdevice(0/*COMEDI_SUBD_AI*/),
-	d_n_chan(1),	// number of input channels
+	d_n_chan(1),	// number of channels to read
 	d_map(0),
 	d_buffer_size(0),
 	d_buf_front(0),
-	d_buf_back(0)
+	d_buf_back(0),
+	d_sample_size(0)
     {
       int aref = AREF_GROUND;
       int range = 0;
@@ -77,10 +81,14 @@ namespace gr {
 	throw std::runtime_error("source_f_impl");
       }
 
+      comedi_set_global_oor_behavior(COMEDI_OOR_NUMBER);
+
       unsigned int chanlist[256];
 
       for(int i=0; i<d_n_chan; i++) {
 	chanlist[i] = CR_PACK(i,range,aref);
+	range_info[i] = comedi_get_range(d_dev, d_subdevice, 0, range);
+	maxdata[i] = comedi_get_maxdata(d_dev, d_subdevice, 0);
       }
 
       comedi_cmd cmd;
@@ -103,10 +111,18 @@ namespace gr {
       if(d_map == MAP_FAILED)
 	bail("mmap", errno);
 
+      ret = comedi_get_subdevice_flags(d_dev, d_subdevice);
+      if(ret < 0){
+	bail("comedi_get_subdevice_flags", comedi_errno());
+      }
+      d_sample_size = (ret & SDF_LSAMPL)
+		? sizeof(lsampl_t) : sizeof(sampl_t);
+      printf("comedi device sample size is %u\n", d_sample_size);
+      printf("comedi device channel number is %u\n", d_n_chan);
+
       cmd.chanlist = chanlist;
       cmd.chanlist_len = d_n_chan;
       cmd.scan_end_arg = d_n_chan;
-
       cmd.stop_src = TRIG_NONE;
       cmd.stop_arg = 0;
 
@@ -136,10 +152,9 @@ namespace gr {
       if(ret < 0)
 	bail("comedi_command", comedi_errno());
 
-      set_output_multiple(d_n_chan*sizeof(sampl_t));
+      set_output_multiple(d_n_chan*sizeof(float));
 
-      assert(sizeof(sampl_t) == sizeof(short));
-      set_output_signature(io_signature::make(1, 1, sizeof(sampl_t)));
+      set_output_signature(io_signature::make(1, 1, sizeof(float)));
     }
 
     bool
@@ -168,17 +183,18 @@ namespace gr {
     {
       int ret;
 
-      int work_left = noutput_items * sizeof(sampl_t) * d_n_chan;
-      sampl_t *pbuf = (sampl_t*)d_map;
+      int work_left = noutput_items * d_sample_size * d_n_chan;
 
       do {
 	do {
 	  ret = comedi_get_buffer_contents(d_dev, d_subdevice);
 	  if(ret < 0)
 	    bail("comedi_get_buffer_contents", comedi_errno());
+	  printf("noutput_items=%i, ret=%i, work_left=%i, front=%i, back=%i \n", noutput_items, ret, work_left, d_buf_front, d_buf_back);
 
-	  assert(ret % sizeof(sampl_t) == 0);
-	  assert(work_left % sizeof(sampl_t) == 0);
+
+	  assert(ret % d_sample_size == 0);
+	  assert(work_left % d_sample_size == 0);
 
 	  ret = std::min(ret, work_left);
 	  d_buf_front += ret;
@@ -191,19 +207,26 @@ namespace gr {
 
 	  if(d_buf_front==d_buf_back) {
 	    usleep(1000000*std::min(work_left,
-				    d_buffer_size/2)/(d_sampling_freq*sizeof(sampl_t)*d_n_chan));
+				    d_buffer_size/2)/(d_sampling_freq*d_sample_size*d_n_chan));	
 	    continue;
 	  }
 	} while(d_buf_front == d_buf_back);
 
-	for(unsigned i=d_buf_back/sizeof(sampl_t); i < d_buf_front/sizeof(sampl_t); i++) {
+	
+	for(unsigned i=d_buf_back/d_sample_size; i < d_buf_front/d_sample_size; i++) {
 	  int chan = i%d_n_chan;
-	  int o_idx = noutput_items-work_left/d_n_chan/sizeof(sampl_t) + \
-	    (i-d_buf_back/sizeof(sampl_t))/d_n_chan;
+	  int o_idx = noutput_items-work_left/d_n_chan/d_sample_size + \
+	    (i-d_buf_back/d_sample_size)/d_n_chan;
 
 	  if(output_items[chan])
-	    ((short*)(output_items[chan]))[o_idx] =
-	      (int)pbuf[i%(d_buffer_size/sizeof(sampl_t))] - 32767;
+	    if (d_sample_size == sizeof(lsampl_t)) {
+	    ((float*)(output_items[chan]))[o_idx] =
+	      (float)comedi_to_phys(*(((lsampl_t*)d_map)+i%(d_buffer_size/d_sample_size)), range_info[chan], maxdata[chan]);
+            } ;
+            if (d_sample_size == sizeof(sampl_t)) {
+	    ((float*)(output_items[chan]))[o_idx] =
+	      (float)comedi_to_phys(*(((sampl_t*)d_map)+i%(d_buffer_size/d_sample_size)), range_info[chan], maxdata[chan]);
+            } ;  
 	}
 
 	ret = comedi_mark_buffer_read(d_dev,d_subdevice, d_buf_front-d_buf_back);

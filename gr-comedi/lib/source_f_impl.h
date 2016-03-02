@@ -49,6 +49,7 @@ namespace gr {
       int       d_buffer_size;
       unsigned  d_buf_front;
       unsigned  d_buf_back;
+      unsigned int d_sample_size;
 
       // random stats
       int d_noverruns;		// count of overruns
